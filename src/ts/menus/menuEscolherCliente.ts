@@ -1,4 +1,3 @@
-import Armazem from "../dominio/armazem";
 import ImpressorListaCliente from "../impressores/impressorListaClientes";
 import Menu from "../interfaces/menu";
 import Cliente from "../modelos/cliente";
