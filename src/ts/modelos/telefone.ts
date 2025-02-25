@@ -10,6 +10,9 @@ export default class Telefone implements Prototipo {
     public get Ddd() { return this.ddd }
     public get Numero() { return this.numero }
 
+    public set Ddd(ddd: string) {this.ddd = ddd}
+    public set Numero(numero: string) {this.numero = numero}
+
     clonar(): Prototipo {
         let tel_copy = new Telefone(this.ddd, this.numero)
         return tel_copy

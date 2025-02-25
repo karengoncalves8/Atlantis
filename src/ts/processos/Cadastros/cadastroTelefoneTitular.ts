@@ -1,6 +1,7 @@
 import Processo from "../../abstracoes/processo"
 import Cliente from "../../modelos/cliente"
 import Telefone from "../../modelos/telefone"
+import ReceberDadosTelefone from "../ReceberInformações/receberDadosTelefone"
 
 export default class CadastroTelefoneTitular extends Processo {
     private cliente: Cliente
@@ -11,10 +12,9 @@ export default class CadastroTelefoneTitular extends Processo {
     }
 
     processar(): void {
-        console.log('Coletando os dados de telefone...')
-        let ddd = this.entrada.receberTexto('Qual o ddd?')
-        let numero = this.entrada.receberTexto('Qual o número?')
-        let telefone = new Telefone(ddd, numero)
+        let receberDadosTelefone = new ReceberDadosTelefone()
+        let dadosTelefone = receberDadosTelefone.processar()
+        let telefone = new Telefone(dadosTelefone.ddd, dadosTelefone.numero)
         this.cliente.Telefones.push(telefone)
     }
 

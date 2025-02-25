@@ -12,7 +12,6 @@ export default class CadastroEnderecoTitular extends Processo {
     }
 
     processar(): void {
-        console.log('Coletando os dados de endereço...')
         let receberDados = new ReceberDadosEndereco()
         let dadosEndereco = receberDados.processar()
         let endereco = new Endereco(dadosEndereco.rua, dadosEndereco.bairro, dadosEndereco.cidade, dadosEndereco.estado, dadosEndereco.pais, dadosEndereco.codigoPostal)

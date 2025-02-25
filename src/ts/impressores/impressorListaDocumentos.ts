@@ -9,7 +9,7 @@ export default class ImpressorListaDocumentos implements Impressor {
     }
 
     imprimir(): string {
-        let impressao = `****************************\n`
+        let impressao = ''
 
         if(this.documentos.length > 0){
             this.documentos.forEach((item, index) => {
@@ -20,7 +20,6 @@ export default class ImpressorListaDocumentos implements Impressor {
             console.log('Não há documentos cadastrados.')
         }
 
-        impressao = impressao + `\n****************************`
         return impressao
     }
 

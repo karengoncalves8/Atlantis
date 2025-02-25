@@ -3,6 +3,7 @@ import Armazem from "../../dominio/armazem"
 import Cliente from "../../modelos/cliente"
 import Endereco from "../../modelos/endereco"
 import Telefone from "../../modelos/telefone"
+import ReceberDadosBasicosCliente from "../ReceberInformações/receberDadosBasicosCliente"
 import AssociarTitular from "./associarTitular"
 import CadastrarDocumentosCliente from "./cadastrarDocumentosCliente"
 
@@ -10,10 +11,9 @@ import CadastrarDocumentosCliente from "./cadastrarDocumentosCliente"
 export default class CadastroClienteDependente extends Processo {
     processar(): void {
         console.log('Iniciando o cadastro de um novo cliente dependente...')
-        let nome = this.entrada.receberTexto('Qual o nome do novo cliente?')
-        let nomeSocial = this.entrada.receberTexto('Qual o nome social do novo cliente?')
-        let dataNascimento = this.entrada.receberData('Qual a data de nascimento?')
-        let cliente = new Cliente(nome, nomeSocial, dataNascimento)
+        let receberDadosBasicos = new ReceberDadosBasicosCliente()
+        let dadosBasicos = receberDadosBasicos.processar()
+        let cliente = new Cliente(dadosBasicos.nome, dadosBasicos.nomeSocial, dadosBasicos.dataNascimento)
 
         this.processo = new AssociarTitular(cliente)
         this.processo.processar()
