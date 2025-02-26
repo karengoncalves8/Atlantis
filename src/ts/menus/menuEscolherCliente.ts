@@ -10,7 +10,6 @@ export default class MenuEscolherCliente implements Menu {
     }
 
     mostrar(): void {
-        console.clear()
         console.log(`****************************`)
         console.log(`| Escolha um cliente: `)
         console.log(`----------------------`)

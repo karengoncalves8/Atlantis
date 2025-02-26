@@ -13,7 +13,7 @@ export default class ImpressorListaTelefones implements Impressor {
 
         if(this.telefones.length > 0){
             this.telefones.forEach((item, index) => {
-                impressao += `${index} - (${item.Ddd}) ${item.Numero}`
+                impressao = impressao + `\n|${index + 1} - (${item.Ddd}) ${item.Numero}`
             })
         }
         else{

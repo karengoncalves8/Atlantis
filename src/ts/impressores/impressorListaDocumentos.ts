@@ -13,7 +13,7 @@ export default class ImpressorListaDocumentos implements Impressor {
 
         if(this.documentos.length > 0){
             this.documentos.forEach((item, index) => {
-                impressao += `${index} - ${item.Tipo}: ${item.Numero}`
+                impressao = impressao + `\n|${index + 1} - ${item.Tipo}: ${item.Numero}`
             })
         }
         else{

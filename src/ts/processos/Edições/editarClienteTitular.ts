@@ -56,6 +56,6 @@ export default class EditarClienteTitular extends Processo {
 
         }
 
-        console.log('Finalizando o cadastro do cliente...')
+        console.log('Finalizando edição do cliente...')
     }
 }
