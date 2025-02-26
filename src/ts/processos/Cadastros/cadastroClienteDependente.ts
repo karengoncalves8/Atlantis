@@ -19,7 +19,7 @@ export default class CadastroClienteDependente extends Processo {
         this.processo.processar()
 
         cliente.Endereco = (cliente.Titular.Endereco.clonar() as Endereco)
-        cliente.Telefones.push(...cliente.Telefones.map((telefone) => telefone.clonar() as Telefone))
+        cliente.Telefones.push(...cliente.Titular.Telefones.map((telefone) => telefone.clonar() as Telefone))
 
         this.processo = new CadastrarDocumentosCliente(cliente)
         this.processo.processar()

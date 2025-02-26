@@ -11,4 +11,8 @@ export default class Armazem {
         return this.clientes
     }
 
+    public set Clientes(clientes: Cliente[]) {
+        this.clientes = clientes
+    }
+
 }
