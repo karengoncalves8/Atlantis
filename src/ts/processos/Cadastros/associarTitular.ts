@@ -26,7 +26,12 @@ export default class AssociarTitular extends Processo {
 
         let titularIndex = this.entrada.receberNumero('Opção escolhida: ')
         let titular = this.clientesTitulares[titularIndex]
-        this.cliente.Titular = titular
-        titular.Dependentes.push(this.cliente)
+        if(titular){
+            this.cliente.Titular = titular
+            titular.Dependentes.push(this.cliente)
+        }else{
+            console.log('Opção não entendida :c')
+        }
+
     }
 }

@@ -13,7 +13,7 @@ export default class ListagemClienteGeral extends Processo {
     }
     processar(): void {
         console.clear()
-        console.log('Iniciando a listagem dos clientes titulares...')
+        console.log('Iniciando a listagem de todos os clientes...')
         this.clientes.forEach(cliente => {
             this.impressor = new ImpressaorCliente(cliente)
             console.log(this.impressor.imprimir())

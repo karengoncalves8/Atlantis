@@ -18,15 +18,17 @@ export default class CadastroClienteDependente extends Processo {
         this.processo = new AssociarTitular(cliente)
         this.processo.processar()
 
-        cliente.Endereco = (cliente.Titular.Endereco.clonar() as Endereco)
-        cliente.Telefones.push(...cliente.Titular.Telefones.map((telefone) => telefone.clonar() as Telefone))
-
-        this.processo = new CadastrarDocumentosCliente(cliente)
-        this.processo.processar()
-
-        let armazem = Armazem.InstanciaUnica
-        armazem.Clientes.push(cliente)
-
-        console.log('Finalizando o cadastro do cliente...')
+        if(cliente.Titular){
+            cliente.Endereco = (cliente.Titular.Endereco.clonar() as Endereco)
+            cliente.Telefones.push(...cliente.Titular.Telefones.map((telefone) => telefone.clonar() as Telefone))
+    
+            this.processo = new CadastrarDocumentosCliente(cliente)
+            this.processo.processar()
+    
+            let armazem = Armazem.InstanciaUnica
+            armazem.Clientes.push(cliente)
+    
+            console.log('Finalizando o cadastro do cliente...')
+        }
     }
 }
