@@ -1,13 +1,16 @@
 import Processo from "../abstracoes/processo";
 import MenuTipoListagemClientes from "../menus/menuTipoListagemClientes";
-import ListagemTitulares from "./listagemTitulares";
+import ListagemClienteGeral from "./Listagens/listagemClienteGeral";
+import ListagemDependentes from "./Listagens/listagemDependentes";
+import ListagemTitulares from "./Listagens/listagemTitulares";
+import ListagemTitularEspecifico from "./Listagens/listagemTitularEspecifico";
 
 export default class TipoListagemClientes extends Processo {
-    constructor() {
+    constructor(){
         super()
         this.menu = new MenuTipoListagemClientes()
     }
-
+    
     processar(): void {
         this.menu.mostrar()
         this.opcao = this.entrada.receberNumero('Qual a opção desejada?')
@@ -16,7 +19,18 @@ export default class TipoListagemClientes extends Processo {
                 this.processo = new ListagemTitulares()
                 this.processo.processar()
                 break
-
+            case 2:
+                this.processo = new ListagemDependentes()
+                this.processo.processar()
+                break;
+            case 3:
+                this.processo = new ListagemTitularEspecifico()
+                this.processo.processar()
+                break;
+            case 4:
+                this.processo = new ListagemClienteGeral()
+                this.processo.processar()
+                break;
             default:
                 console.log('Opção não entendida... :(')
         }
