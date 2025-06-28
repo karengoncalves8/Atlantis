@@ -1,11 +1,13 @@
 import Processo from "../abstracoes/processo"
 import MenuPrincipal from "../menus/menuPricipal"
 
-import ListagemAcomodacoes from "./listagemAcomodacoes"
+import ListagemAcomodacoes from "./Listagens/listagemAcomodacoes"
 import ExcluirCliente from "./Exclusões/ExcluirDependente"
 import TipoCadastroCliente from "./tipoCadastroCliente"
 import TipoEditarCliente from "./tipoEditarCliente"
 import TipoListagemClientes from "./tipoListagemClientes"
+import ListagemHospedagens from "./Listagens/listagemHospedagens"
+import CadastroHospedagem from "./Cadastros/cadastroHospedagem"
 
 export default class Principal extends Processo {
     constructor() {
@@ -35,6 +37,14 @@ export default class Principal extends Processo {
                 break
             case 5:
                 this.processo = new ListagemAcomodacoes()
+                this.processo.processar()
+                break
+            case 6:
+                this.processo = new ListagemHospedagens()
+                this.processo.processar()
+                break
+            case 7:
+                this.processo = new CadastroHospedagem()
                 this.processo.processar()
                 break
             case 0:
