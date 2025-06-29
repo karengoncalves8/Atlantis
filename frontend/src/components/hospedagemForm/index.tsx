@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 // interfaces
-import { NomeAcomadacao } from "@/enums/NomeAcomadacao";
+
 import Cliente from "@/interfaces/cliente";
+import { NomeAcomadacao } from "@/interfaces/acomodacao";
 
 // Components
 import { Button } from "@/components/ui/button";
@@ -26,55 +27,18 @@ import { Input } from "@/components/ui/input"
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const formSchema = z.object({
-  tipoAcomodacao: z.nativeEnum(NomeAcomadacao, {
+  tipoAcomodacao: z.object({
+    id: z.number(),
+    nome: z.string(),
+    descricao: z.string()
+  }, {
     message: "Tipo de acomodação é obrigatório.",
   }),
   clienteTitular: z.object({
-    nome: z.string().min(1, { message: "Cliente titular é obrigatório." }),
-    nomeSocial: z.string(),
-    dataNascimento: z.any(),
-    dataCadastro: z.any(),
-    telefones: z.array(z.object({
-      ddd: z.string(),
-      numero: z.string()
-    })),
-    endereco: z.object({
-      rua: z.string(),
-      bairro: z.string(),
-      cidade: z.string(),
-      estado: z.string(),
-      pais: z.string(),
-      codigoPostal: z.string()
-    }),
-    documentos: z.array(z.object({
-      numero: z.string(),
-      tipo: z.any(),
-      dataExpedicao: z.any()
-    }))
+    id: z.number(),
+    nome: z.string(),
+    nomeSocial: z.string()
   }).nullable(),
-  clientesDependentes: z.array(z.object({
-    nome: z.string().min(1, { message: "Cliente dependente é obrigatório." }),
-    nomeSocial: z.string(),
-    dataNascimento: z.any(),
-    dataCadastro: z.any(),
-    telefones: z.array(z.object({
-      ddd: z.string(),
-      numero: z.string()
-    })),
-    endereco: z.object({
-      rua: z.string(),
-      bairro: z.string(),
-      cidade: z.string(),
-      estado: z.string(),
-      pais: z.string(),
-      codigoPostal: z.string()
-    }),
-    documentos: z.array(z.object({
-      numero: z.string(),
-      tipo: z.any(),
-      dataExpedicao: z.any()
-    }))
-  })),
   dataEntrada: z.string().min(1, {
     message: "Data de entrada é obrigatória.",
   }),
@@ -91,15 +55,19 @@ type FormData = z.infer<typeof formSchema>
 interface HospedagemFormProps {
   clientesDisponiveis: Cliente[];
   onSubmit: (data: FormData) => void;
+  nomeAcomodacoes: NomeAcomadacao[];
 }
 
-export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemFormProps) {
+export function HospedagemForm({ clientesDisponiveis, nomeAcomodacoes, onSubmit }: HospedagemFormProps) {
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
-      tipoAcomodacao: NomeAcomadacao.SolteiroSimples,
+      tipoAcomodacao: {
+        id: 1,
+        nome: "Solteiro Simples",
+        descricao: "Acomodação simples para solteiro(a)"
+      },
       clienteTitular: null,
-      clientesDependentes: [],
       dataEntrada: "",
       dataSaida: "",
       dias: 1
@@ -107,7 +75,11 @@ export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemForm
   });
 
   const handleSubmit = (data: FormData) => {
-    onSubmit(data);
+    if (!data.clienteTitular) {
+      alert("Por favor, selecione um cliente titular");
+      return;
+    }
+    onSubmit(data as any);
   };
 
   const calcularDias = () => {
@@ -123,18 +95,6 @@ export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemForm
     }
   };
 
-  const adicionarDependente = () => {
-    const dependentesAtuais = form.getValues("clientesDependentes");
-    if (clientesDisponiveis.length > 0) {
-      form.setValue("clientesDependentes", [...dependentesAtuais, clientesDisponiveis[0]]);
-    }
-  };
-
-  const removerDependente = (index: number) => {
-    const dependentesAtuais = form.getValues("clientesDependentes");
-    const novosDependentes = dependentesAtuais.filter((_, i) => i !== index);
-    form.setValue("clientesDependentes", novosDependentes);
-  };
 
   return (
     <Form {...form}>
@@ -147,13 +107,19 @@ export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemForm
             <FormItem>
               <FormLabel>Tipo de Acomodação</FormLabel>
               <FormControl>
-                <select {...field} className="w-full p-2 border rounded">
-                  <option value={NomeAcomadacao.SolteiroSimples}>Acomodação simples para solteiro(a)</option>
-                  <option value={NomeAcomadacao.CasalSimples}>Acomodação simples para casal</option>
-                  <option value={NomeAcomadacao.FamilaSimples}>Acomodação para família com até duas crianças</option>
-                  <option value={NomeAcomadacao.FamiliaMais}>Acomodação para família com até cinco crianças</option>
-                  <option value={NomeAcomadacao.SolteiroMais}>Acomodação com garagem para solteiro(a)</option>
-                  <option value={NomeAcomadacao.FamiliaSuper}>Acomodação para até duas famílias, casal e três crianças cada</option>
+                <select 
+                  className="w-full p-2 border rounded"
+                  onChange={(e) => {
+                    const acomodacaoSelecionada = nomeAcomodacoes.find(a => a.id === parseInt(e.target.value));
+                    field.onChange(acomodacaoSelecionada);
+                  }}
+                  value={field.value?.id || ""}
+                >
+                  {nomeAcomodacoes.map((nomeAcomodacao) => (
+                    <option key={nomeAcomodacao.id} value={nomeAcomodacao.id}>
+                      {nomeAcomodacao.nome}
+                    </option>
+                  ))}
                 </select>
               </FormControl>
               <FormMessage />
@@ -172,14 +138,18 @@ export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemForm
                 <select 
                   className="w-full p-2 border rounded"
                   onChange={(e) => {
-                    const clienteSelecionado = clientesDisponiveis.find(c => c.nome === e.target.value);
-                    field.onChange(clienteSelecionado || null);
+                    const clienteSelecionado = clientesDisponiveis.find(c => c.id === parseInt(e.target.value));
+                    field.onChange(clienteSelecionado ? {
+                      id: clienteSelecionado.id!,
+                      nome: clienteSelecionado.nome,
+                      nomeSocial: clienteSelecionado.nomeSocial
+                    } : null);
                   }}
-                  value={field.value?.nome || ""}
+                  value={field.value?.id || ""}
                 >
                   <option value="">Selecione um cliente</option>
                   {clientesDisponiveis.map((cliente) => (
-                    <option key={cliente.nome} value={cliente.nome}>
+                    <option key={cliente.id} value={cliente.id}>
                       {cliente.nome} - {cliente.nomeSocial}
                     </option>
                   ))}
@@ -189,56 +159,6 @@ export function HospedagemForm({ clientesDisponiveis, onSubmit }: HospedagemForm
             </FormItem>
           )}
         />
-
-        {/* Clientes Dependentes */}
-        <div>
-          <FormLabel>Clientes Dependentes</FormLabel>
-          {form.watch("clientesDependentes").map((_, index) => (
-            <div key={index} className="flex gap-2 mb-2">
-              <FormField
-                control={form.control}
-                name={`clientesDependentes.${index}`}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <select 
-                        className="w-full p-2 border rounded"
-                        onChange={(e) => {
-                          const clienteSelecionado = clientesDisponiveis.find(c => c.nome === e.target.value);
-                          field.onChange(clienteSelecionado || null);
-                        }}
-                        value={field.value?.nome || ""}
-                      >
-                        <option value="">Selecione um dependente</option>
-                        {clientesDisponiveis.map((cliente) => (
-                          <option key={cliente.nome} value={cliente.nome}>
-                            {cliente.nome} - {cliente.nomeSocial}
-                          </option>
-                        ))}
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button 
-                type="button" 
-                variant="destructive" 
-                size="sm"
-                onClick={() => removerDependente(index)}
-              >
-                <FontAwesomeIcon icon={faTrash} />
-              </Button>
-            </div>
-          ))}
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={adicionarDependente}
-          >
-            Adicionar Dependente
-          </Button>
-        </div>
 
         {/* Datas */}
         <div className="grid grid-cols-2 gap-4">

@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, Resolver } from "react-hook-form"
 import { z } from "zod"
 
 // interfaces
@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // icons
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -35,9 +36,8 @@ const formSchema = z.object({
   dataNascimento: z.string().min(1, {
     message: "Data de nascimento é obrigatória.",
   }),
-  dataCadastro: z.string().min(1, {
-    message: "Data de cadastro é obrigatória.",
-  }),
+  isDependente: z.boolean().optional().default(false),
+  titularId: z.number().optional(),
   telefones: z.array(z.object({
     ddd: z.string().min(2, { message: "DDD deve ter 2 dígitos." }),
     numero: z.string().min(8, { message: "Número deve ter pelo menos 8 dígitos." })
@@ -52,7 +52,11 @@ const formSchema = z.object({
   }),
   documentos: z.array(z.object({
     numero: z.string().min(1, { message: "Número do documento é obrigatório." }),
-    tipo: z.nativeEnum(TipoDocumento),
+    tipo: z.union([z.string(), z.number()]).transform((val) => {
+      const num = typeof val === 'string' ? parseInt(val) : val;
+      if ([0, 1, 2].includes(num)) return num;
+      throw new Error("Tipo de documento deve ser CPF (0), RG (1) ou Passaporte (2)");
+    }),
     dataExpedicao: z.string().min(1, { message: "Data de expedição é obrigatória." })
   })).min(1, { message: "Pelo menos um documento é obrigatório." })
 })
@@ -63,33 +67,35 @@ interface ClienteFormProps {
   initialData?: Cliente;
   onSubmit: (data: FormData) => void;
   isEditMode?: boolean;
+  clientesTitulares?: Cliente[]; // Lista de clientes que não são dependentes
 }
 
-export function ClienteForm({ initialData, onSubmit, isEditMode = false }: ClienteFormProps) {
+export function ClienteForm({ initialData, onSubmit, isEditMode = false, clientesTitulares = [] }: ClienteFormProps) {
   const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema) as Resolver<FormData>,
     defaultValues: initialData ? {
       nome: initialData.nome,
       nomeSocial: initialData.nomeSocial,
-      dataNascimento: initialData.dataNascimento instanceof Date 
-        ? initialData.dataNascimento.toISOString().split('T')[0]
+      dataNascimento: initialData.dataNascimento 
+        ? new Date(initialData.dataNascimento).toISOString().split('T')[0]
         : '',
-      dataCadastro: initialData.dataCadastro instanceof Date 
-        ? initialData.dataCadastro.toISOString().split('T')[0]
-        : '',
+      isDependente: !!initialData.titularId,
+      titularId: initialData.titularId || undefined,
       telefones: initialData.telefones,
       endereco: initialData.endereco,
       documentos: initialData.documentos.map(doc => ({
         ...doc,
-        dataExpedicao: doc.dataExpedicao instanceof Date 
-          ? doc.dataExpedicao.toISOString().split('T')[0]
+        tipo: typeof doc.tipo === 'string' ? parseInt(doc.tipo) : doc.tipo,
+        dataExpedicao: doc.dataExpedicao 
+          ? new Date(doc.dataExpedicao).toISOString().split('T')[0]
           : ''
       }))
     } : {
       nome: "",
       nomeSocial: "",
       dataNascimento: "",
-      dataCadastro: new Date().toISOString().split('T')[0],
+      isDependente: false,
+      titularId: undefined,
       telefones: [{ ddd: "", numero: "" }],
       endereco: {
         rua: "",
@@ -106,6 +112,8 @@ export function ClienteForm({ initialData, onSubmit, isEditMode = false }: Clien
   const handleSubmit = (data: FormData) => {
     onSubmit(data);
   };
+
+  const isDependente = form.watch("isDependente");
 
   return (
     <Form {...form}>
@@ -154,22 +162,59 @@ export function ClienteForm({ initialData, onSubmit, isEditMode = false }: Clien
               </FormItem>
             )}
           />
-          {!isEditMode && (
-            <FormField
-              control={form.control}
-              name="dataCadastro"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Data de Cadastro</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
         </div>
+
+        {/* Checkbox IsDependente */}
+        <FormField
+          control={form.control}
+          name="isDependente"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  É dependente de outro cliente?
+                </FormLabel>
+                <FormDescription>
+                  Marque se este cliente é dependente de um cliente titular
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        {/* Select Cliente Titular */}
+        {isDependente && (
+          <FormField
+            control={form.control}
+            name="titularId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cliente Titular</FormLabel>
+                <FormControl>
+                  <select 
+                    className="w-full p-2 border rounded"
+                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    value={field.value || ""}
+                  >
+                    <option value="">Selecione um cliente titular</option>
+                    {clientesTitulares.map((cliente) => (
+                      <option key={cliente.id} value={cliente.id}>
+                        {cliente.nome} - {cliente.nomeSocial}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         {/* Telefones */}
         <div>
@@ -335,7 +380,11 @@ export function ClienteForm({ initialData, onSubmit, isEditMode = false }: Clien
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <select {...field} className="w-full p-2 border rounded">
+                      <select 
+                        className="w-full p-2 border rounded"
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        value={field.value}
+                      >
                         <option value={TipoDocumento.CPF}>CPF</option>
                         <option value={TipoDocumento.RG}>RG</option>
                         <option value={TipoDocumento.Passaporte}>Passaporte</option>
@@ -380,7 +429,11 @@ export function ClienteForm({ initialData, onSubmit, isEditMode = false }: Clien
             variant="outline" 
             onClick={() => {
               const currentDocumentos = form.getValues("documentos");
-              form.setValue("documentos", [...currentDocumentos, { numero: "", tipo: TipoDocumento.CPF, dataExpedicao: "" }]);
+              form.setValue("documentos", [...currentDocumentos, { 
+                numero: "", 
+                tipo: TipoDocumento.CPF as number, 
+                dataExpedicao: "" 
+              }]);
             }}
           >
             Adicionar Documento

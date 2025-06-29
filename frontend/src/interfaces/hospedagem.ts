@@ -1,11 +1,10 @@
-import { NomeAcomadacao } from "@/enums/NomeAcomadacao";
+import { NomeAcomadacao } from "./acomodacao";
 import Cliente from "./cliente";
 
 export interface Hospedagem {
-  tipoAcomodacao: NomeAcomadacao; // Tipo de acomodação
-  clienteTitular: Cliente; // Cliente titular
-  clientesDependentes: Cliente[]; // Lista de dependentes
-  dataEntrada: Date; // Data de entrada
-  dataSaida: Date; // Data de saída
-  dias: number; // Número de dias de estadia
+    tipoAcomadacao: NomeAcomadacao; 
+    clienteTitular: Cliente; // Cliente titular
+    dataEntrada: Date; // Data de entrada
+    dataSaida: Date; // Data de saída
+    dias: number; // Número de dias de estadia
 }
