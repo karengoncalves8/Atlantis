@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
+
+.title{
+    font-size: 26px;
+    font-family: "Kaushan Script", cursive;
+    color: var(--blue);
+    cursor: pointer;
+}
+
+.subTitle{
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.subTitle:hover{
+    color: var(--blue);
+}
+
+.active{
+    color: var(--blue);
+    font-weight: 600;
+}

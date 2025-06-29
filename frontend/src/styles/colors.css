@@ -1,0 +1,11 @@
+:root {
+
+    /* Blue */
+    --blue: #00A9CE;
+    --blue-light: #9ADBE8;
+    --blue-dark: #306773;
+
+    /* Gray */
+    --gray-700: #2F2F2F;
+    --gray-100: #EEEEEE;
+}
