@@ -77,6 +77,16 @@ export const columnsCliente: ColumnDef<Cliente>[] = [
     }
   },
   {
+    accessorKey: "titular",
+    header: "Titular",
+    cell: ({ row }) => {
+      let value = row.getValue("titular") as Cliente;
+      if (!value) return <div className="text-center">Sim</div>;
+    
+      return <div className="text-center">Não</div>
+    }
+  },
+  {
     id: "acoes",
     header: "Ações",  
     cell: ({ row }) => (

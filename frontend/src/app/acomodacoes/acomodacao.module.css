@@ -1,0 +1,18 @@
+.container{
+    display: flex;
+   align-items: center;
+   flex-wrap: wrap;
+   width: 100%;
+   gap: 4rem;
+}
+.card{
+   display: flex;
+   flex-direction: column;
+   gap: 0.3rem;
+}
+
+.text{
+    font-size: 25;
+    font-weight: bold;
+    color:var(--blue-dark)
+}

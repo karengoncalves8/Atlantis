@@ -1,6 +1,39 @@
 import { TipoDocumento } from "@/enums/tipoDocumento";
 import Cliente from "@/interfaces/cliente";
 
+const cliente3:Cliente = {
+		nome: "João Silva",
+		nomeSocial: "Joãozinho",
+		dataNascimento: new Date("1990-05-10"),
+		dataCadastro: new Date("2020-01-01"),
+		telefones: [
+		{ ddd: "11", numero: "987654321" },
+		{ ddd: "21", numero: "998877665" }
+		],
+		endereco: {
+		rua: "Rua das Flores",
+		bairro: "Centro",
+		cidade: "São Paulo",
+		estado: "SP",
+		pais: "Brasil",
+		codigoPostal: "12345-678"
+		},
+		documentos: [
+		{
+			numero: "123.456.789-00",
+			tipo: TipoDocumento.CPF,
+			dataExpedicao: new Date("2010-05-10")
+		},
+		{
+			numero: "12.345.678-9",
+			tipo: TipoDocumento.RG,
+			dataExpedicao: new Date("2005-08-15")
+		}
+		],
+		dependentes: [],
+		titular: undefined
+	}
+	
 export const mockClientes: Cliente[] = [
 	{
 		nome: "João Silva",
@@ -32,7 +65,7 @@ export const mockClientes: Cliente[] = [
 		}
 		],
 		dependentes: [],
-		titular: undefined
+		titular: cliente3
 	},
 	{
 		nome: "Maria Oliveira",
